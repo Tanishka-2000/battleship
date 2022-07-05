@@ -1,3 +1,4 @@
+// create ship with specific length and its coordinates
 function Ship(shipLength, coordinates){
     const positionHit = [];
     function hit(n){
@@ -14,6 +15,7 @@ function Ship(shipLength, coordinates){
     };
 }
 
+// GameBoard can recieve attack at a cordinate
  function GameBoard(){
      // hardcoded placement of ships
     ships = [Ship(4,[12,13,14,15]), Ship(3,[5,6,7]), Ship(3,[67,77,87]), Ship(2,[34,35]), Ship(2,[45,55]),
@@ -45,6 +47,33 @@ function Ship(shipLength, coordinates){
     }
     return {recieveAttack, allSank};
  }
+
+// create genuine player with its gameBoard
+function realPlayer(){
+    let turn = false;
+    const gameBoard = GameBoard();
+    return{ gameBoard, turn};
+}
+
+// a computed player has to create random attacks
+function computedPlayer(){
+    let player = realPlayer();
+    const attackedPos = [];
+    function randomPosition(){
+        let x = Math.floor(Math.random() * 10);
+        let y = Math.floor(Math.random() * 10) + 1;
+        return (x*10 + y);
+    }
+    function createAttack(){
+        let n = randomPosition();
+        while(attackedPos.includes(n)){
+            n = randomPosition();
+        }
+        attackedPos.push(n);
+        return n;
+    }
+    return Object.assign(player,{createAttack});
+}
 
 module.exports = {
     Ship,
