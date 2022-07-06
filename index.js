@@ -70,7 +70,8 @@ function ComputedPlayer(){
     }
     return {createAttack};
 }
-function Game(){
+function Game(board, gameBoard, heading){
+    const computer = ComputedPlayer();
     function createGameBoard(board){
         for (let i = 1; i <= 100; i++) {
             let div = document.createElement('div');
@@ -86,7 +87,33 @@ function Game(){
             });
         }
     }
-    return {createGameBoard, placeShips};
+    function play(e){
+        let position = e.target.getAttribute('data-coord');
+        let result = gameBoard2.recieveAttack(Number(position));
+        e.target.classList.add(result);
+        deactivatePlayer(e.target.parentElement);
+        computerPlay(e.target.parentElement);
+    }
+    function deactivatePlayer(element){
+        heading.textContent = "Computer's turn";
+        element.classList.remove('active');
+        element.removeEventListener('click', game.play);
+    }
+
+    function activatePlayer(element){
+        heading.textContent = "Player's turn";
+        element.classList.add('active');
+        element.addEventListener('click', game.play);
+    }
+    function computerPlay(otherGameBoard){
+        let choice = computer.createAttack();
+        let divs = board.querySelectorAll('div');
+        let result = gameBoard1.recieveAttack(choice);
+        divs[choice-1].classList.add(result);
+        activatePlayer(otherGameBoard);
+    }
+
+    return {createGameBoard, placeShips, play, activatePlayer};
 }
 // module.exports = {
 //     Ship,
@@ -96,21 +123,19 @@ function Game(){
 // Game loop starts here
 const board1 = document.querySelector('.gameBoard1');
 const board2 = document.querySelector('.gameBoard2');
-const game = Game();
-// displaying gameBoard on screnn
-game.createGameBoard(board1);
-game.createGameBoard(board2);
+const heading = document.querySelector('h1');
 
 const gameBoard1 = GameBoard();
 const gameBoard2 = GameBoard();
-const computer = ComputedPlayer();
+
+
+const game = Game(board1, gameBoard2, heading);
+// displaying gameBoard on screnn
+game.createGameBoard(board1);
+game.createGameBoard(board2);
 
 // displayig ships on the gameBoard
 game.placeShips(board1, gameBoard1);
 
 // responding to attack when user click on board
-board2.addEventListener('click', function(e){
-    let position = e.target.getAttribute('data-coord');
-    let result = gameBoard1.recieveAttack(Number(position));
-    e.target.classList.add(result);
-});
+game.activatePlayer(board2)
