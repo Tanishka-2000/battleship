@@ -1,4 +1,4 @@
-const {Ship, GameBoard} = require('./index.js');
+const {Ship, GameBoard,} = require('./index.js');
 
 describe('testing ship function', () => {
     test('ship length always remian same', () => {
@@ -27,14 +27,23 @@ describe('testing ship function', () => {
 describe('testing gameBoard function with predefined coordinates of ships', () => {
     test('getting hit when attacked at ship coordinate', () => {
         let gameBoard1 = GameBoard();
-        expect(gameBoard1.recieveAttack(14)).toBe("Hit");
+        expect(gameBoard1.recieveAttack(12)).toBe("hit");
+        expect(gameBoard1.recieveAttack(14)).toBe("hit");
+        expect(gameBoard1.recieveAttack(77)).toBe("hit");
+        expect(gameBoard1.recieveAttack(55)).toBe("hit");
+        expect(gameBoard1.recieveAttack(42)).toBe("hit");
+        expect(gameBoard1.recieveAttack(95)).toBe("hit");
     });
     test('getting miss when attacked at empty coordinate', () => {
         let gameBoard1 = GameBoard();
-        expect(gameBoard1.recieveAttack(3)).toBe("Miss");
+        expect(gameBoard1.recieveAttack(3)).toBe("miss");
+        expect(gameBoard1.recieveAttack(22)).toBe("miss");
+        expect(gameBoard1.recieveAttack(37)).toBe("miss");
+        expect(gameBoard1.recieveAttack(66)).toBe("miss");
+        expect(gameBoard1.recieveAttack(88)).toBe("miss");
     });
     test('allSank function return false for new gameBoard', () => {
         let gameBoard1 = GameBoard();
         expect(gameBoard1.allSank()).toBe(false);
-    })
+    });
 });

@@ -1,0 +1,45 @@
+*{
+    margin: 0;
+    m+padding: 0;
+    box-sizing: border-box;
+}
+ h1{
+     width: 500px;
+     margin: 50px auto;
+     text-align: center;
+     font-size: 3rem;
+ }
+ .main{
+     display: flex;
+     justify-content: space-around;
+ }
+.board{
+    width: 800px;
+    display: grid;;
+    grid-template-columns: repeat(10,1fr);
+    border: 1px solid black;
+}
+.board>div{
+    border: 1px solid black;
+    width: 80px;
+    height: 80px;
+}
+.gameBoard2>div:not(.miss):not(.hit):hover{
+    background-color: #9EB23B;
+}
+.ship{
+    background-color: #34B3F1;
+}
+.miss{
+    background-color: #FBCB0A;
+}
+.hit{
+    background-color: #FF5D5D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hit::before{
+    content: "\274C";
+    font-size: 4rem;
+}
