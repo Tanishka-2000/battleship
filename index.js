@@ -91,8 +91,9 @@ function Game(board, gameBoard, heading){
         let position = e.target.getAttribute('data-coord');
         let result = gameBoard2.recieveAttack(Number(position));
         e.target.classList.add(result);
-        deactivatePlayer(e.target.parentElement);
-        computerPlay(e.target.parentElement);
+        let elem = e.target.parentElement
+        deactivatePlayer(elem);
+        computerPlay(elem);
     }
     function deactivatePlayer(element){
         heading.textContent = "Computer's turn";
@@ -106,11 +107,14 @@ function Game(board, gameBoard, heading){
         element.addEventListener('click', game.play);
     }
     function computerPlay(otherGameBoard){
-        let choice = computer.createAttack();
-        let divs = board.querySelectorAll('div');
-        let result = gameBoard1.recieveAttack(choice);
-        divs[choice-1].classList.add(result);
-        activatePlayer(otherGameBoard);
+        setTimeout(function(){
+            let choice = computer.createAttack();
+            let divs = board.querySelectorAll('div');
+            let result = gameBoard1.recieveAttack(choice);
+            divs[choice-1].classList.add(result);
+            activatePlayer(otherGameBoard);
+        },500);
+
     }
 
     return {createGameBoard, placeShips, play, activatePlayer};
