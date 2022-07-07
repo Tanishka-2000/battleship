@@ -51,7 +51,7 @@ function createCoords(length, takenCoords) {
 }
 
 function randomCoord(length){
-    let x = Math.floor(Math.random() * (10 - length + 1)) + 1;
+    let x = Math.floor(Math.random() * (10 - length)) + 1;
     let y = Math.floor(Math.random() * (10 - length + 1)) + 1;
     return (x*10 + y);
 }
