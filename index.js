@@ -17,11 +17,50 @@ function Ship(shipLength, coordinates){
     };
 }
 
+function createShips(){
+    let takenCoords = [];
+    let ships = [];
+    for (let i = 1; i <= 4; i++) {
+        for (let j = 1; j <= 5-i; j++) {
+            let coords = createCoords(i, takenCoords);
+            ships.push(new Ship(i, coords));
+            takenCoords = [...takenCoords, ...coords];
+        }
+    }
+    return ships;
+}
+
+function createCoords(length, takenCoords) {
+    let temp = [];
+    while(true){
+        let pos = randomCoord(length);
+
+        temp = [];
+        for (let i = 0; i <length; i++) {
+            temp.push(pos + i);
+        }
+        if(!temp.some(n => takenCoords.includes(n))) break;
+
+        temp = [];
+        for (let i = 0; i <length; i++) {
+            temp.push(pos + (10*i));
+        }
+        if(!temp.some(n => takenCoords.includes(n))) break;
+    }
+    return temp;
+}
+
+function randomCoord(length){
+    let x = Math.floor(Math.random() * (10 - length + 1)) + 1;
+    let y = Math.floor(Math.random() * (10 - length + 1)) + 1;
+    return (x*10 + y);
+}
+
 // GameBoard can recieve attack at a cordinate
- function GameBoard(){
+ function GameBoard(ships){
      // hardcoded placement of ships
-    let ships = [Ship(4,[12,13,14,15]), Ship(3,[7,8,9]), Ship(3,[67,77,87]), Ship(2,[34,35]), Ship(2,[55,65]),
-        Ship(2,[42,52]), Ship(1,[95]), Ship(1,[69]), Ship(1,[38]), Ship(1,[29])];
+    // let ships = [Ship(4,[12,13,14,15]), Ship(3,[7,8,9]), Ship(3,[67,77,87]), Ship(2,[34,35]), Ship(2,[55,65]),
+    //     Ship(2,[42,52]), Ship(1,[95]), Ship(1,[69]), Ship(1,[38]), Ship(1,[29])];
     let missed = [];
     let sankedShips = 0;
     // check for hit and miss
@@ -117,7 +156,7 @@ function Game(){
             clickedDiv.classList.add(result);
             // check for win
             if(currentGameBoard.allSank()){
-                winner = currentGameBoard === computerGameBoard ? 'player': 'computer';
+                winner = currentGameBoard === computerGameBoard ? 'Player': 'Computer';
                 gameOver();
                 return;
             };
@@ -126,44 +165,42 @@ function Game(){
     function deactivatePlayer(){
         heading.textContent = "Computer's turn";
         board2.classList.remove('active');
+        board1.style.opacity = '1';
+        board2.style.opacity = '.6';
         board2.removeEventListener('click', start);
     }
 
     function activatePlayer(){
         heading.textContent = "Player's turn";
         board2.classList.add('active');
+        board1.style.opacity = '.6';
+        board2.style.opacity = '1';
         board2.addEventListener('click', start);
     }
 
     function gameOver(){
         deactivatePlayer();
+        board1.style.opacity = '.6';
         heading.textContent = winner + ' Wins!';
     }
-    // function computerPlay(){
-    //         let choice = computer.createAttack();
-    //         let divs = board1.querySelectorAll('div');
-    //         let result = gameBoard1.recieveAttack(choice);
-    //         if(result) divs[choice-1].classList.add(result);
-    //         if(gameBoard1.allSank()){
-    //             winner = 'Computer';
-    //             gameOver();
-    //         }
-    // }
     return {createGameBoard, placeShips, activatePlayer, winner};
 }
 // module.exports = {
 //     Ship,
 //     GameBoard,
-//     ComputedPlayer
+//     ComputedPlayer,
+//     createCoords,
+//     createShips,
 // };
 
 // Game loop starts here
+
 const board1 = document.querySelector('.gameBoard1');
 const board2 = document.querySelector('.gameBoard2');
 const heading = document.querySelector('h1');
 
-const computerGameBoard = GameBoard();
-const playerGameBoard = GameBoard();
+const computerGameBoard = GameBoard(createShips());
+const playerGameBoard = GameBoard(createShips());
 
 const game = Game();
 // displaying gameBoard on screnn

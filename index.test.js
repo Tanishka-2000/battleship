@@ -1,4 +1,4 @@
-const {Ship, GameBoard, ComputedPlayer} = require('./index.js');
+const {Ship, GameBoard, ComputedPlayer, createCoords, createShips} = require('./index.js');
 
 describe('testing ship function', () => {
     test('testing coordinates of ships', () => {
@@ -84,7 +84,7 @@ describe('testing gameBoard function with predefined coordinates of ships', () =
 });
 
 describe('computer should not generate same attack twice', () => {
-    const mockRandom = jest.fn()
+    const mockRandom = jest.fn();
     mockRandom.mockReturnValueOnce(23).mockReturnValueOnce(30).mockReturnValueOnce(30).mockReturnValueOnce(45);
     const player = ComputedPlayer(mockRandom);
 
@@ -92,5 +92,51 @@ describe('computer should not generate same attack twice', () => {
         expect(player.createAttack()).toBe(23);
         expect(player.createAttack()).toBe(30);
         expect(player.createAttack()).toBe(45);
+    });
+});
+
+describe('create ships with random coordinates', () => {
+    const mockRandomCoord = jest.fn();
+    mockRandomCoord.mockReturnValueOnce(23).mockReturnValueOnce(30).mockReturnValueOnce(30).mockReturnValueOnce(45);
+
+    test('create random coordinates', () => {
+        expect(createCoords(4,[],mockRandomCoord)).toEqual([23,24,25,26]);
+    });
+
+    test('create random coordinates', () => {
+        expect(createCoords(4,[31],mockRandomCoord)).toEqual([30,40,50,60]);
+    });
+
+    test('create random coordinates', () => {
+        expect(createCoords(4,[30,40,50,60],mockRandomCoord)).toEqual([45,46,47,48]);
+    });
+});
+
+describe('calling createShip function with rigth agruments', () => {
+    const mockCreateCoord = jest.fn();
+    createShips(mockCreateCoord);
+    // mockRandomCoord.mockReturnValueOnce(23).mockReturnValueOnce(30).mockReturnValueOnce(30).mockReturnValueOnce(45);
+
+    test('call createShip function 10 times', () => {
+        expect(mockCreateCoord.mock.calls.length).toBe(10);
+    });
+
+    test('call createShip function with right arguments', () => {
+        expect(mockCreateCoord.mock.calls[0][0]).toBe(1);
+        expect(mockCreateCoord.mock.calls[1][0]).toBe(1);
+        expect(mockCreateCoord.mock.calls[2][0]).toBe(1);
+        expect(mockCreateCoord.mock.calls[3][0]).toBe(1);
+    });
+    test('call createShip function with right arguments', () => {
+        expect(mockCreateCoord.mock.calls[4][0]).toBe(2);
+        expect(mockCreateCoord.mock.calls[5][0]).toBe(2);
+        expect(mockCreateCoord.mock.calls[6][0]).toBe(2);
+    });
+    test('call createShip function with right arguments', () => {
+        expect(mockCreateCoord.mock.calls[7][0]).toBe(3);
+        expect(mockCreateCoord.mock.calls[8][0]).toBe(3);;
+    });
+    test('call createShip function with right arguments', () => {
+        expect(mockCreateCoord.mock.calls[9][0]).toBe(4);
     });
 });
