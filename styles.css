@@ -24,7 +24,7 @@
     width: 80px;
     height: 80px;
 }
-.active>div:not(.miss):not(.hit):hover{
+.gameBoard2.active>div:not(.miss):not(.hit):hover{
     background-color: #9EB23B;
 }
 .ship{
