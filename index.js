@@ -1,10 +1,3 @@
-const shipType = {
-    1:'submarine',
-    2:'detroyer',
-    3:'BattleShip',
-    4:'carrier'
-};
-
 // create ship with specific length and its coordinates
 function Ship(shipLength, coordinates){
     function hit(n){
@@ -32,47 +25,36 @@ function createShips(){
         for (let j = 1; j <= 5-i; j++) {
             let coords = createCoords(i, takenCoords);
             ships.push(new Ship(i, coords));
-            // set.clear();
-            // coords.forEach(value => {
-            //     set.add(value);
-            //     set.add(value + 1);
-            //     set.add(value - 1);
-            //     set.add(value + 10);
-            //     set.add(value - 10);
-            // });
-            // for(const value of set.values()){
-            //     takenCoords.push(value);
-            // }
             takenCoords = [...takenCoords, ...coords];
         }
     }
-    return ships;
-}
 
-function createCoords(length, takenCoords) {
-    let temp = [];
-    while(true){
-        let pos = randomCoord(length);
+    function createCoords(length, takenCoords) {
+        let temp = [];
+        while(true){
+            let pos = randomCoord(length);
 
-        temp = [];
-        for (let i = 0; i <length; i++) {
-            temp.push(pos + i);
+            temp = [];
+            for (let i = 0; i <length; i++) {
+                temp.push(pos + i);
+            }
+            if(!temp.some(n => takenCoords.includes(n))) break;
+
+            temp = [];
+            for (let i = 0; i <length; i++) {
+                temp.push(pos + (10*i));
+            }
+            if(!temp.some(n => takenCoords.includes(n))) break;
         }
-        if(!temp.some(n => takenCoords.includes(n))) break;
-
-        temp = [];
-        for (let i = 0; i <length; i++) {
-            temp.push(pos + (10*i));
-        }
-        if(!temp.some(n => takenCoords.includes(n))) break;
+        return temp;
     }
-    return temp;
-}
 
-function randomCoord(length){
-    let x = Math.floor(Math.random() * (10 - length)) + 1;
-    let y = Math.floor(Math.random() * (10 - length + 1)) + 1;
-    return (x*10 + y);
+    function randomCoord(length){
+        let x = Math.floor(Math.random() * (10 - length)) + 1;
+        let y = Math.floor(Math.random() * (10 - length + 1)) + 1;
+        return (x*10 + y);
+    }
+    return ships;
 }
 
 // GameBoard can recieve attack at a cordinate
@@ -112,7 +94,7 @@ function randomCoord(length){
  }
 
 // computed player has to create random attacks
-function ComputedPlayer(randomPosition){
+function ComputedPlayer(){
     const attackedPos = [];
     let player = 'user';
 
@@ -124,15 +106,14 @@ function ComputedPlayer(randomPosition){
         attackedPos.push(n);
         return n;
     }
+    function randomPosition(){
+        return Math.floor(Math.random()*100) + 1;
+    }
     return {createAttack};
 }
 
-function randomPosition(){
-    return Math.floor(Math.random()*100) + 1;
-}
-
 function Game(){
-    const computer = ComputedPlayer(randomPosition);
+    const computer = ComputedPlayer();
     let winner;
 
     function createGameBoard(board){
@@ -232,6 +213,9 @@ function Game(){
 
 ///////////////////////////////////////////////////////
 
+// board 1 => playerGameBoard (place ships according to player game board) => recieve attack from player 2 (computer)
+// board 2 => computerGameBoard (place ships according to computer game board) => recieve attack from player 1 (user)
+
 const withPlayer = document.querySelector('.withPlayer');
 const withComputer = document.querySelector('.withComputer');
 const cover = document.querySelector('.cover');
@@ -251,6 +235,9 @@ withComputer.addEventListener('click', function(){
     cover.style.display = 'none';
 });
 
+withPlayer.addEventListener('click', function(){
+    cover.style.display = 'none';
+});
 
 let takenCoords = [];
 const lengths = [4,3,3,2,2,2,1,1,1,1];
@@ -258,10 +245,22 @@ let n = 1;
 shipNum = 0;
 let coords = [];
 const ships = [];
+const shipType = {
+    4:'Carrier Ship',
+    3:'BattleShip',
+    2:'Submarine',
+    1:'Petrol Boat'
+};
+
+document.querySelector('.horizontal').addEventListener('click', () => n = 1);
+document.querySelector('.vertical').addEventListener('click',() => n = 10);
+
 
 board1.addEventListener('mouseover', showPossibleCoords);
 board1.addEventListener('mouseout', hidePossibleCoords);
 board1.addEventListener('click', placeShip);
+
+heading.textContent = 'Place your '+ shipType[lengths[shipNum]];
 
 function showPossibleCoords(e){
     coords = [];
@@ -294,6 +293,7 @@ function placeShip(){
     });
     takenCoords = [...takenCoords, ...coords];
     shipNum++;
+    heading.textContent = 'Place your '+ shipType[lengths[shipNum]];
     if(shipNum === 10) startGame();
 }
 
