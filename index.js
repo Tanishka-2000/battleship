@@ -1,3 +1,10 @@
+const shipType = {
+    1:'submarine',
+    2:'detroyer',
+    3:'BattleShip',
+    4:'carrier'
+};
+
 // create ship with specific length and its coordinates
 function Ship(shipLength, coordinates){
     function hit(n){
@@ -20,10 +27,22 @@ function Ship(shipLength, coordinates){
 function createShips(){
     let takenCoords = [];
     let ships = [];
+    let set = new Set();
     for (let i = 1; i <= 4; i++) {
         for (let j = 1; j <= 5-i; j++) {
             let coords = createCoords(i, takenCoords);
             ships.push(new Ship(i, coords));
+            // set.clear();
+            // coords.forEach(value => {
+            //     set.add(value);
+            //     set.add(value + 1);
+            //     set.add(value - 1);
+            //     set.add(value + 10);
+            //     set.add(value - 10);
+            // });
+            // for(const value of set.values()){
+            //     takenCoords.push(value);
+            // }
             takenCoords = [...takenCoords, ...coords];
         }
     }
@@ -58,9 +77,6 @@ function randomCoord(length){
 
 // GameBoard can recieve attack at a cordinate
  function GameBoard(ships){
-     // hardcoded placement of ships
-    // let ships = [Ship(4,[12,13,14,15]), Ship(3,[7,8,9]), Ship(3,[67,77,87]), Ship(2,[34,35]), Ship(2,[55,65]),
-    //     Ship(2,[42,52]), Ship(1,[95]), Ship(1,[69]), Ship(1,[38]), Ship(1,[29])];
     let missed = [];
     let sankedShips = 0;
     // check for hit and miss
@@ -74,6 +90,7 @@ function randomCoord(length){
             if(!attacked.hit(n)) return;
                 if(attacked.isSunk()){
                      this.sankedShips++;
+                     // updateDisplayBoard(attacked.length);
                  }
                 return "hit";
         }
@@ -185,30 +202,128 @@ function Game(){
     }
     return {createGameBoard, placeShips, activatePlayer, winner};
 }
+
+
+
+// Game loop starts here
+// const withPlayer = document.querySelector('.withPlayer');
+// const withComputer = document.querySelector('.withComputer');
+
+// const computerdisplayBoard = document.querySelector('.ships.computer');
+// const playerdisplayBoard = document.querySelector('.ships.player');
+
+// const board1 = document.querySelector('.gameBoard1');
+// const board2 = document.querySelector('.gameBoard2');
+// const heading = document.querySelector('h1');
+//
+// const computerGameBoard = GameBoard(createShips());
+// const playerGameBoard = GameBoard(createShips());
+//
+// const game = Game();
+// // displaying gameBoard on screnn
+// game.createGameBoard(board1);
+// game.createGameBoard(board2);
+//
+// // displayig ships on the gameBoard
+// game.placeShips(board1, playerGameBoard);
+//
+// // responding to attack when user click on board
+// game.activatePlayer()
+
+///////////////////////////////////////////////////////
+
+const withPlayer = document.querySelector('.withPlayer');
+const withComputer = document.querySelector('.withComputer');
+const cover = document.querySelector('.cover');
+
+const board1 = document.querySelector('.gameBoard1');
+const board2 = document.querySelector('.gameBoard2');
+const heading = document.querySelector('h1');
+
+const game = Game();
+game.createGameBoard(board1);
+const divs = board1.querySelectorAll('div');
+
+const computerGameBoard = GameBoard(createShips());
+let playerGameBoard;
+
+withComputer.addEventListener('click', function(){
+    cover.style.display = 'none';
+});
+
+
+let takenCoords = [];
+const lengths = [4,3,3,2,2,2,1,1,1,1];
+let n = 1;
+shipNum = 0;
+let coords = [];
+const ships = [];
+
+board1.addEventListener('mouseover', showPossibleCoords);
+board1.addEventListener('mouseout', hidePossibleCoords);
+board1.addEventListener('click', placeShip);
+
+function showPossibleCoords(e){
+    coords = [];
+    let pos = Number(e.target.getAttribute('data-coord'));
+
+    for(let i = 0; i < lengths[shipNum]; i++){
+        coords.push(pos + (n*i));
+    }
+
+    if(!validateCoords()) return;
+
+    coords.forEach(i => {
+        divs[i - 1].classList.add('hovered');
+    });
+}
+
+function hidePossibleCoords(){
+    if(!coords) return;
+    coords.forEach(i => {
+        divs[i - 1].classList.remove('hovered');
+    });
+}
+
+function placeShip(){
+    if(!validateCoords()) return;
+    ships.push(new Ship(coords.length, coords));
+
+    coords.forEach(i => {
+        divs[i - 1].classList.add('ship');
+    });
+    takenCoords = [...takenCoords, ...coords];
+    shipNum++;
+    if(shipNum === 10) startGame();
+}
+
+function validateCoords(){
+    if(coords.some(i => takenCoords.includes(i))) return false;
+    let x = parseInt(coords[0]/10);
+    let y = coords[0]%10;
+    if(y === 0){
+        x--;
+        y = 10;
+    }
+    if((n === 1) && (y > (10 - coords.length + 1))) return false;
+    if((n === 10) && (x > (10 - coords.length + 1))) return false;
+    return true;
+}
+
+function startGame(){
+    board1.removeEventListener('mouseover', showPossibleCoords);
+    board1.removeEventListener('mouseout', hidePossibleCoords);
+    board1.removeEventListener('click', placeShip);
+
+    playerGameBoard = new GameBoard(ships);
+    game.createGameBoard(board2);
+    game.activatePlayer();
+}
 // module.exports = {
 //     Ship,
 //     GameBoard,
 //     ComputedPlayer,
 //     createCoords,
 //     createShips,
+//     validateCoords
 // };
-
-// Game loop starts here
-
-const board1 = document.querySelector('.gameBoard1');
-const board2 = document.querySelector('.gameBoard2');
-const heading = document.querySelector('h1');
-
-const computerGameBoard = GameBoard(createShips());
-const playerGameBoard = GameBoard(createShips());
-
-const game = Game();
-// displaying gameBoard on screnn
-game.createGameBoard(board1);
-game.createGameBoard(board2);
-
-// displayig ships on the gameBoard
-game.placeShips(board1, playerGameBoard);
-
-// responding to attack when user click on board
-game.activatePlayer()
