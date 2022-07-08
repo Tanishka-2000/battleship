@@ -96,9 +96,25 @@ function createShips(){
 // computed player has to create random attacks
 function ComputedPlayer(){
     const attackedPos = [];
-    let player = 'user';
+    const values = {
+        0:1,
+        1:-1,
+        2:10,
+        3:-10
+    }
+    const last4moves = [];
+    let m = 0;
+    // let player = 'user';
 
     function createAttack(){
+        for(let i = 0; i< 4; i++){
+            let temp = getIntelligentHit();
+            if(temp && !attackedPos.includes(temp)){
+                attackedPos.push(temp);
+                 return temp;
+             }
+             storeAttack('miss');
+        }
         let n = randomPosition();
         while(attackedPos.includes(n)){
             n = randomPosition();
@@ -106,10 +122,27 @@ function ComputedPlayer(){
         attackedPos.push(n);
         return n;
     }
+    function getIntelligentHit(){
+        if((attackedPos.length > 0) && (last4moves.length> 0)){
+             if(last4moves[last4moves.length - 1] === 'hit'){
+                 return (attackedPos[attackedPos.length - 1] + Number(values[m]));
+            }
+            if(last4moves.includes('hit')){
+                m =( m+1)%4;
+                return (attackedPos[attackedPos.length - 1] + Number(values[m]));
+            }
+        }
+        return false;
+    }
     function randomPosition(){
         return Math.floor(Math.random()*100) + 1;
     }
-    return {createAttack};
+
+    function storeAttack(s){
+        last4moves.push(s);
+        if(last4moves.length > 4) last4moves.shift();
+    }
+    return {createAttack, storeAttack};
 }
 
 function Game(){
@@ -150,7 +183,8 @@ function Game(){
         let position = clickedDiv.getAttribute('data-coord');
         let result = currentGameBoard.recieveAttack(Number(position));
 
-        if(result) {
+        if(result){
+            if(currentGameBoard === playerGameBoard) computer.storeAttack(result);
             clickedDiv.classList.add(result);
             // check for win
             if(currentGameBoard.allSank()){
@@ -252,9 +286,11 @@ const shipType = {
     1:'Petrol Boat'
 };
 
-document.querySelector('.horizontal').addEventListener('click', () => n = 1);
-document.querySelector('.vertical').addEventListener('click',() => n = 10);
+const horizontal = document.querySelector('.horizontal');
+const vertical = document.querySelector('.vertical');
 
+horizontal.addEventListener('click', () => n = 1);
+vertical.addEventListener('click',() => n = 10);
 
 board1.addEventListener('mouseover', showPossibleCoords);
 board1.addEventListener('mouseout', hidePossibleCoords);
@@ -278,7 +314,7 @@ function showPossibleCoords(e){
 }
 
 function hidePossibleCoords(){
-    if(!coords) return;
+    if(!coords || !validateCoords()) return;
     coords.forEach(i => {
         divs[i - 1].classList.remove('hovered');
     });
@@ -306,7 +342,7 @@ function validateCoords(){
         y = 10;
     }
     if((n === 1) && (y > (10 - coords.length + 1))) return false;
-    if((n === 10) && (x > (10 - coords.length + 1))) return false;
+    if((n === 10) && (x > (10 - coords.length))) return false;
     return true;
 }
 
@@ -314,6 +350,7 @@ function startGame(){
     board1.removeEventListener('mouseover', showPossibleCoords);
     board1.removeEventListener('mouseout', hidePossibleCoords);
     board1.removeEventListener('click', placeShip);
+    horizontal.parentElement.style.display = 'none';
 
     playerGameBoard = new GameBoard(ships);
     game.createGameBoard(board2);
