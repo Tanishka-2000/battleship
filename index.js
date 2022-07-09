@@ -129,7 +129,8 @@ function ComputedPlayer(){
             }
             if(last4moves.includes('hit')){
                 m =( m+1)%4;
-                return (attackedPos[attackedPos.length - 1] + Number(values[m]));
+                let x = 4 - last4moves.lastIndexOf('hit');
+                return (attackedPos[attackedPos.length - x] + Number(values[m]));
             }
         }
         return false;
@@ -213,7 +214,10 @@ function Game(){
     function gameOver(){
         deactivatePlayer();
         board1.style.opacity = '.6';
-        heading.textContent = winner + ' Wins!';
+        // heading.textContent = winner + ' Wins!';
+        cover.style.display = 'block';
+        cover.children[0].textContent = winner + 'Wins!';
+        withComputer.textContent = 'Restart Game';
     }
     return {createGameBoard, placeShips, activatePlayer, winner};
 }
@@ -250,7 +254,7 @@ function Game(){
 // board 1 => playerGameBoard (place ships according to player game board) => recieve attack from player 2 (computer)
 // board 2 => computerGameBoard (place ships according to computer game board) => recieve attack from player 1 (user)
 
-const withPlayer = document.querySelector('.withPlayer');
+// const withPlayer = document.querySelector('.withPlayer');
 const withComputer = document.querySelector('.withComputer');
 const cover = document.querySelector('.cover');
 
@@ -269,9 +273,9 @@ withComputer.addEventListener('click', function(){
     cover.style.display = 'none';
 });
 
-withPlayer.addEventListener('click', function(){
-    cover.style.display = 'none';
-});
+// withPlayer.addEventListener('click', function(){
+//     cover.style.display = 'none';
+// });
 
 let takenCoords = [];
 const lengths = [4,3,3,2,2,2,1,1,1,1];
