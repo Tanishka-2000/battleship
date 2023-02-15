@@ -1,7 +1,7 @@
-// create ship with specific length and its coordinates
+// create ship with specific length(number) and its coordinates(array)
 function Ship(shipLength, coordinates){
-    function hit(n){
-        if(this.positionHit.includes(n)) return false
+    function hit(n){                // if ship has already attacked at n, return false else, return true
+        if(this.positionHit.includes(n)) return false; 
         this.positionHit.push(n);
         return true;
     }
@@ -17,10 +17,13 @@ function Ship(shipLength, coordinates){
     };
 }
 
+// position on board are numbered from 1 to 100 (i.e. coordinates are from 1 to 100)
+
+// return array of 10 ships with length and coordinates
 function createShips(){
     let takenCoords = [];
     let ships = [];
-    let set = new Set();
+    // let set = new Set();
     for (let i = 1; i <= 4; i++) {
         for (let j = 1; j <= 5-i; j++) {
             let coords = createCoords(i, takenCoords);
@@ -35,46 +38,47 @@ function createShips(){
             let pos = randomCoord(length);
 
             temp = [];
-            for (let i = 0; i <length; i++) {
+            for (let i = 0; i <length; i++) { // filling coords horizontally
                 temp.push(pos + i);
             }
-            if(!temp.some(n => takenCoords.includes(n))) break;
+            if(!temp.some(n => takenCoords.includes(n))) break; // if coords are available, return coords else, continue
 
             temp = [];
-            for (let i = 0; i <length; i++) {
+            for (let i = 0; i <length; i++) { // filling coords vertically
                 temp.push(pos + (10*i));
             }
-            if(!temp.some(n => takenCoords.includes(n))) break;
+            if(!temp.some(n => takenCoords.includes(n))) break; // if coords are available, return coords else, try with another position
         }
         return temp;
     }
 
+    // a ship of length 4 cannot be placed at position (2,9) => box no. 29 as its coords would be 29, 30, 31, 32
     function randomCoord(length){
-        let x = Math.floor(Math.random() * (10 - length)) + 1;
+        let x = Math.floor(Math.random() * (10 - length)) + 1;  //10 - length because my board is 10 X 10
         let y = Math.floor(Math.random() * (10 - length + 1)) + 1;
-        return (x*10 + y);
+        return (x * 10 + y);    // if coords are (2,5) then it is equal to box number 25
     }
     return ships;
 }
 
 // GameBoard can recieve attack at a cordinate
- function GameBoard(ships){
+function GameBoard(ships){
     let missed = [];
     let sankedShips = 0;
     // check for hit and miss
     function recieveAttack(n){
-        let attacked = checkForHit(n);
-        if(attacked === -1) {
+        let attacked = checkForHit(n); // return ship if any(ship) present at position n, else return -1
+        if(attacked === -1) {          // if no ship is present at n then return 'miss'
             if(this.missed.includes(n)) return;
             this.missed.push(n);
             return "miss";
         }else{
-            if(!attacked.hit(n)) return;
-                if(attacked.isSunk()){
-                     this.sankedShips++;
-                     // updateDisplayBoard(attacked.length);
-                 }
-                return "hit";
+            if(!attacked.hit(n)) return;    // if ship is present and ship has been already hit at position n then return
+            if(attacked.isSunk()){      // else check if ship has sanked after new attack
+                    this.sankedShips++;
+                    // updateDisplayBoard(attacked.length);
+                }
+            return "hit";   // return hit
         }
     }
     // checking if any ship present at attacked coordinates
@@ -91,19 +95,19 @@ function createShips(){
         return this.ships.length === this.sankedShips;
     }
     return {recieveAttack, allSank, ships, missed, sankedShips};
- }
+}
 
 // computed player has to create random attacks
 function ComputedPlayer(){
     const attackedPos = [];
     const values = {
-        0:1,
-        1:-1,
-        2:10,
-        3:-10
+        0:1,    // positive x
+        1:-1,   // negative x
+        2:10,   // positive y
+        3:-10   // negative y
     }
     const last4moves = [];
-    let m = 0;
+    let m = 0; // default index of values i.e. positive x
     // let player = 'user';
 
     function createAttack(){
@@ -122,6 +126,7 @@ function ComputedPlayer(){
         attackedPos.push(n);
         return n;
     }
+
     function getIntelligentHit(){
         if((attackedPos.length > 0) && (last4moves.length> 0)){
              if(last4moves[last4moves.length - 1] === 'hit'){
@@ -129,12 +134,14 @@ function ComputedPlayer(){
             }
             if(last4moves.includes('hit')){
                 m =( m+1)%4;
+                // let x = 4 - last4moves.indexOf('hit');
                 let x = 4 - last4moves.lastIndexOf('hit');
                 return (attackedPos[attackedPos.length - x] + Number(values[m]));
             }
         }
         return false;
     }
+    
     function randomPosition(){
         return Math.floor(Math.random()*100) + 1;
     }
